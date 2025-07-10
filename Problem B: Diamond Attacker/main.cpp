@@ -223,7 +223,6 @@ int64_t pathCount(const BigInt& t, int s, int d) {
 }
 
 int main() {
-    cout << endl;
     int r;
     while (cin >> r) {
         string su, sv; cin >> su >> sv;
