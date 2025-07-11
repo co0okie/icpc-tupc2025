@@ -161,7 +161,7 @@ Matrix identityMatrix(int n) {
 }
 
 // A^b % d
-Matrix matPow(const Matrix& A, BigInt b, int d) {
+Matrix matPow(const Matrix& A, const BigInt& b, int d) {
     // cout << "matPow(" << endl;
     // printMatrix(A);
     // cout << ", " << toString(b) << ", " << d << ")" << endl;
@@ -175,7 +175,7 @@ Matrix matPow(const Matrix& A, BigInt b, int d) {
     //     printMatrix(lut[i]);
     //     cout << endl;
     // }
-    for (char r : b) {
+    for (auto r : b) {
         auto ret2 = matMul(ret, ret, d);
         auto ret4 = matMul(ret2, ret2, d);
         auto ret8 = matMul(ret4, ret4, d);
@@ -196,8 +196,6 @@ Matrix matPow(const Matrix& A, BigInt b, int d) {
 int64_t pathCount(const BigInt& t, int s, int d) {
     if (DEBUG) cout << "pathCount(" << toString(t) << ", " << s << ", " << d << ")" << endl;
     if (cmp(t, toBigInt(0)) == 0) return 1;
-    // cout << "cmp(" << toString(t) << ", " << toString(toBigInt(s)) << ") = " << cmp(t, toBigInt(s)) << endl;
-    if (cmp(t, toBigInt(s)) == -1) return matPow({{2}}, sub(t, toBigInt(1)), d)[0][0];
 
     Matrix A(s, Vector(s, 0));
     A[s - 1][0] = 1;
@@ -205,21 +203,19 @@ int64_t pathCount(const BigInt& t, int s, int d) {
         A[s - 1][i] = 1;
         A[i - 1][i] = 1;
     }
-    Matrix x(s, Vector(1, 1));
-    for (int i = 2; i < s; i++) {
-        x[i][0] = (2 * x[i - 1][0]) % d;
-    }
-    // cout << "x:" << endl;
-    // printMatrix(x);
+    Matrix x0(s, Vector(1, 0));
+    x0.back()[0] = 1;
+    // cout << "x0:" << endl;
+    // printMatrix(x0);
     // cout << endl;
-    auto A_to_t_s_1 = matPow(A, sub(t, toBigInt(s - 1)), d);
-    if (DEBUG) cout << "A^{t-s+1}:" << endl;
-    if (DEBUG) printMatrix(A_to_t_s_1);
+    auto A_to_t = matPow(A, t, d);
+    if (DEBUG) cout << "A^{t}:" << endl;
+    if (DEBUG) printMatrix(A_to_t);
     if (DEBUG) cout << endl;
-    if (DEBUG) cout << "A^{t-s+1}x:" << endl;
-    if (DEBUG) printMatrix(matMul(A_to_t_s_1, x, d));
+    if (DEBUG) cout << "A^{t}x0:" << endl;
+    if (DEBUG) printMatrix(matMul(A_to_t, x0, d));
     if (DEBUG) cout << endl;
-    return matMul(A_to_t_s_1, x, d)[s - 1][0];
+    return matMul(A_to_t, x0, d)[s - 1][0];
 }
 
 int main() {
